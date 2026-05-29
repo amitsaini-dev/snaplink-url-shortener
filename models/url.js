@@ -10,6 +10,12 @@ const urlSchema = new Schema({
         type: String,
         required: true,
         unique: true,
+        // sparse:true,
+    },
+    aliasType:{
+        type:String,
+        enum:["nanoid","ai","custom"],
+        default:"nanoid",
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
