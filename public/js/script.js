@@ -1,17 +1,36 @@
-console.log("🔥 SCRIPT LOADED");
+(() => {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  const forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+
+console.log("SCRIPT LOADED");
 const originalUrlInput = document.getElementById("originalUrl");
 const shortCodeInput = document.getElementById("shortCode");
 const aliasTypeInput = document.getElementById("aliasType");
 const feedback = document.getElementById("alias-feedback");
-const btnAI = document.getElementById("btn-ai");
+const btnAI = document.getElementById("ai-btn");
 const btnGen = document.getElementById("btn-generate");
 
-// ── Show feedback below the buttons ─────────────────────────────
+//Show feedback below the buttons
 function showFeedback(message, colorClass) {
   feedback.innerHTML = `<span class="${colorClass}">${message}</span>`;
 }
 
-// ── Put alias into the field and highlight it ────────────────────
+//Put alias into the field and highlight it
 function setAlias(code, type) {
   shortCodeInput.value = code;
   aliasTypeInput.value = type;
@@ -19,12 +38,12 @@ function setAlias(code, type) {
   setTimeout(() => shortCodeInput.classList.remove("border-success"), 1500);
 }
 
-// ── When user types manually, mark as custom ─────────────────────
+//When user types manually mark as custom
 shortCodeInput.addEventListener("input", () => {
   aliasTypeInput.value = "custom";
 });
 
-// ── Button: Generate random nanoid ──────────────────────────────
+//Button: Generate random nanoid
 btnGen.addEventListener("click", async () => {
   showFeedback("⏳ Generating...", "text-muted");
   btnGen.disabled = true;
@@ -42,7 +61,7 @@ btnGen.addEventListener("click", async () => {
   }
 });
 
-// ── Button: AI alias ─────────────────────────────────────────────
+//Button: AI alias
 btnAI.addEventListener("click", async () => {
   const url = originalUrlInput.value.trim();
 

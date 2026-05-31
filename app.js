@@ -33,7 +33,6 @@ main()
         app.listen(port, () => {
             console.log(`Server is listing to port: ${port}`);
         })
-        console.log("GEMINI KEY:", process.env.GEMINI_API_KEY);
     })
     .catch((err) => {
         console.log(err);
@@ -42,6 +41,12 @@ main()
 async function main() {
     await mongoose.connect(MONGO_URL);
 }
+
+function asyncWrap(fn) {
+    return function (req, res, next) {
+        fn(req, res, next).catch(err => next(err));
+    }
+};
 
 //Home page
 app.get("/", (req, res) => {
@@ -55,15 +60,15 @@ app.get("/urls/new", (req, res) => {
 
 //Frontend calls this when user clicks "Generate" button
 //Returns a random 7-char code as JSON
-app.get("/urls/generate", (req, res) => {
+app.get("/urls/generate", asyncWrap((req, res) => {
     const code = nanoid(7);
     res.json({ shortCode: code });
-});
+}));
 
 // Called by frontend JS when user clicks "AI Alias" button
 // Sends long URL to Gemini, gets back a short alias
 // Returns JSON: { shortCode: "react-docs" }
-app.post("/urls/ai-alias", async (req, res) => {
+app.post("/urls/ai-alias", asyncWrap(async (req, res) => {
     try {
         const { originalUrl } = req.body;
         // Step 1: Validate URL exists and is valid
@@ -118,10 +123,10 @@ news-today`;
         console.error("Gemini SDK error:", err.message);
         res.status(500).json({ error: "AI alias generation failed. Try again." });
     }
-});
+}));
 
 // to save url to db
-app.post("/urls", async (req, res) => {
+app.post("/urls", asyncWrap(async (req, res) => {
     let { originalUrl, shortCode } = req.body.url;
     if (!validator.isURL(originalUrl)) {
         return res.send("Invalid URL");
@@ -137,11 +142,11 @@ app.post("/urls", async (req, res) => {
     newUrl.shortCode = shortCode;
     await newUrl.save();
     res.send(newUrl.shortCode);
-});
+}));
 
 
 //to redirect to short code
-app.get("/:shortCode", async (req, res) => {
+app.get("/:shortCode", asyncWrap(async (req, res) => {
     let { shortCode } = req.params;
     const foundUrl = await Url.findOne({ shortCode });
     if (!foundUrl) {
@@ -150,4 +155,19 @@ app.get("/:shortCode", async (req, res) => {
     foundUrl.clicks += 1;
     await foundUrl.save();
     res.redirect(foundUrl.originalUrl);
+}));
+
+//404 handler — no route matched 
+app.use((req, res, next) => {
+    next(new ExpressError(404, "Page not found"));
+});
+
+//Global error handler — all errors land here
+app.use((err, req, res, next) => {
+    const { status = 500, message = "Something went wrong" } = err;
+    res.status(status).send(`
+        <h1>${status} Error</h1>
+        <p>${message}</p>
+        <a href="/">Go home</a>
+    `);
 });

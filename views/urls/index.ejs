@@ -1,69 +1,37 @@
 <% layout("/layouts/boilerplate.ejs") %>
 
-<div class="row justify-content-center">
-  <div class="col-md-7">
-    <div class="card shadow-sm border-0 mt-4">
-      <div class="card-body p-4">
+  <div class="row">
+    <div class="col-8 offset-2">
 
-        <h4 class="mb-4 fw-semibold">🔗 Shorten a URL</h4>
+      <h3 class="mt-4 mb-1">Shorten Links. Share Smarter.</h3>
+      <p class="text-muted mb-4">Turn long URLs into clean, memorable links.</p>
 
-        <form method="POST" action="/urls">
+      <form method="post" action="/urls" class="needs-validation" novalidate>
 
-          <!-- ── Long URL ───────────────────────────── -->
-          <div class="mb-3">
-            <label for="originalUrl" class="form-label fw-medium">Long URL</label>
-            <input
-              type="text"
-              id="originalUrl"
-              name="url[originalUrl]"
-              class="form-control"
-              placeholder="https://example.com/very/long/link"
-              required
-            >
-          </div>
+        <div class="mb-3">
+          <label for="originalUrl" class="form-label fw-medium">Long URL</label>
+          <input type="text" placeholder="https://example.com/very/long/link" id="originalUrl" name="url[originalUrl]"
+            class="form-control" required>
+          <div class="invalid-feedback">Please Enter a valid URL.</div>
+        </div>
 
-          <!-- ── Short Alias Field ─────────────────── -->
-          <div class="mb-3">
-            <label for="shortCode" class="form-label fw-medium">Short alias</label>
+        <div class="mb-3">
+          <label for="shortCode" class="form-label fw-medium">Short alias</label>
+          <input type="text" name="url[shortCode]" id="shortCode" class="form-control"
+            placeholder="Click a button below, or type your own" required>
+          <div class="invalid-feedback">Please enter a short alias.</div>
+        </div>
 
-            <input
-              type="text"
-              id="shortCode"
-              name="url[shortCode]"
-              class="form-control mb-2"
-              placeholder="Click a button below, or type your own"
-            >
+        <input type="hidden" id="aliasType" name="url[aliasType]" value="custom">
 
-            <!-- Hidden: tracks how alias was made -->
-            <input type="hidden" id="aliasType" name="url[aliasType]" value="custom">
+        <div class="mb-4">
+          <button type="button" class="btn btn-outline-primary" id="btn-generate">Generate Alias</button>
+          <button type="button" class="btn btn-outline-primary" id="ai-btn">AI Suggestion</button>
+          <div id="alias-feedback" class="mt-2 small"></div>
+        </div>
 
-            <!-- ── Three Buttons ───────────────────── -->
-            <div class="d-flex gap-2 flex-wrap align-items-center">
+        <button type="submit" class="btn btn-dark mt-2 mb-4"> Create SnapLink</button>
 
-              <button type="button" id="btn-generate" class="btn btn-outline-secondary btn-sm">
-                ⚡ Generate random
-              </button>
-
-              <button type="button" id="btn-ai" class="btn btn-outline-primary btn-sm">
-                🤖 AI alias
-              </button>
-
-              <span class="text-muted small">or type your own above</span>
-
-            </div>
-
-            <!-- Feedback message shows here -->
-            <div id="alias-feedback" class="mt-2 small"></div>
-          </div>
-
-          <!-- ── Submit ────────────────────────────── -->
-          <button type="submit" class="btn btn-dark w-100 mt-1">
-            ✅ Save short URL
-          </button>
-
-        </form>
-
-      </div>
+      </form>
     </div>
   </div>
-</div>
